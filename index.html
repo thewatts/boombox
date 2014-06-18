@@ -15,9 +15,11 @@
     <script src="tests/load-tests.js"></script>
   </head>
   <body>
+
     <script type="text/x-handlebars">
-      <header><h1>BümBöx</h1></header>
+      <header><h1>{{#linkTo 'index'}}BümBöx{{/linkTo}}</h1></header>
       {{outlet}}
+      {{render "nowPlaying"}}
     </script>
 
     <script type="text/x-handlebars" id="index">
@@ -30,7 +32,7 @@
             <p class="album-name">{{name}}</p>
             <p class="album-artist">{{artist}}</p>
             <p class="song-count">
-              8 songs
+            {{ songs.length }} songs
               {{#if isExplicit}}<span class="explicit">EXPLICIT</span>{{/if}}
             </p>
           </div>
@@ -46,19 +48,61 @@
       </div>
 
       <table class="album-listing">
-        {{#each songs}}
-          <tr>
+        {{#each songs itemController=songItem}}
+          <tr {{bindAttr class=isPlaying}}>
             <td class="song-track">
               <span class="track-number">{{track}}</span>
+              <span class="play" {{action "play" this}}>▶</span>
             </td>
             <td class="song-name">{{name}}</td>
             <td class="song-duration">{{format-duration duration}}</td>
           </tr>
         {{/each}}
         <tr>
-          <td class="total-duration" colspan="3">Total Time: 40:03</td>
+          <td class="total-duration" colspan="3">
+            Total Time: {{format-duration totalDuration}}
+          </td>
         </tr>
       </table>
+    </script>
+
+    <script type="text/x-handlebars" id="nowPlaying">
+      <footer class="now-playing">
+        {{#if model}}
+          <img class="now-playing-artwork" {{bindAttr src=album.artwork}}>
+          <div class="now-playing-body">
+            <p class="now-playing-details">
+              <span class="now-playing-name">{{name}}</span> -
+              <span class="now-playing-artist">{{album.artist}}</span>
+            </p>
+            <div class="now-playing-player">
+              {{audio-player src=url}}
+            </div>
+          </div>
+        {{else}}
+          <span class="now-playing-empty">
+            Select a song to start playing.
+          </span>
+        {{/if}}
+      </footer>
+    </script>
+
+    <script type="text/x-handlebars" id="components/audio-player">
+      {{#if isPlaying }}
+        <button class="pause" {{action "pause"}}>❙❙</button>
+        {{audio-time duration=duration currentTime=currentTime}}
+      {{else}}
+        <button class="play" {{action "play"}}>▶</button>
+      {{/if}}
+      <audio {{bindAttr src=src}} autoplay></audio>
+    </script>
+
+    <script type="text/x-handlebars" id="components/audio-time">
+      {{#if isShowingRemaining}}
+        <p class="remaining-time">{{format-duration remainingTime}}</p>
+      {{else}}
+        <p class="current-time">{{format-duration currentTime}}</p>
+      {{/if}}
     </script>
 
     <div id="qunit" style="display: none"></div>

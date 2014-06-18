@@ -41,6 +41,11 @@ header h1 {
   overflow: hidden;
 }
 
+header h1 a {
+  display: block;
+  height: 100%;
+}
+
 .album-list {
   display: -webkit-flex;
   -webkit-flex-flow: row wrap;

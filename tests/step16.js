@@ -28,3 +28,47 @@
 */
 
 step(16, "Click to Toggle Remaining Time");
+
+testComponent('audio-time', "By default it will show the current time", function(component) {
+  Ember.run(function() {
+    component.set('currentTime', 100);
+  });
+
+  equal(component.$('p.current-time').text(), "1:40");
+});
+
+testComponent('audio-time', "When isShowingRemaining is true, the current time is not displayed and the remaining time is displayed", function(component) {
+  Ember.run(function() {
+    component.set('currentTime', 100);
+    component.set('duration', 250);
+
+    component.set('isShowingRemaining', true);
+  });
+
+  equal(component.$('p.current-time').length, "0", "the current time is not displayed");
+  equal(component.$('p.remaining-time').text(), "2:30");
+});
+
+testComponent('audio-time', "When clicking on the component, the isShowingRemaining property is toggled", function(component) {
+  Ember.run(function() {
+    component.set('currentTime', 100);
+    component.set('duration', 250);
+
+    component.set('isShowingRemaining', true);
+  });
+
+  click('p.current-time');
+
+  equal(component.$('p.current-time').length, "0", "the current time is not displayed");
+  equal(component.$('p.remaining-time').text(), "2:30");
+});
+
+testComponent('audioPlayer', "once the component's src is set, the play button changes to a pause button", function(component) {
+  Ember.run(function() {
+    component.set('src', "audio/Southern_Nights_-_07_-_All_My_Sorrows.mp3");
+  });
+
+  waitFor(component, 'isPlaying').then(function() {
+    equal(component.$('p.current-time').length, 1);
+  });
+});
